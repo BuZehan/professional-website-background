@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getCode } from "@/api";
+import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getCode ,getShowDataForBanner} from "@/api";
 
 export default {
   name: "Home",
@@ -15,7 +15,7 @@ export default {
         xwdt: 0,
         tzgg: 0,
         hjzs: 0,
-        lbt: 3,
+        swiper: 3,
         stu: 8,
         teacher: 6
       }
@@ -51,7 +51,7 @@ export default {
               { value: this.newsData.xwdt, name: '新闻动态' },
               { value: this.newsData.tzgg, name: '通知公告' },
               { value: this.newsData.hjzs, name: '获奖证书' },
-              { value: this.newsData.lbt, name: '首页轮播图' },
+              { value: this.newsData.swiper, name: '首页轮播图' },
               { value: this.newsData.stu, name: '优秀校友' },
               { value: this.newsData.teacher, name: '教师数据' },
             ],
@@ -69,7 +69,7 @@ export default {
     // 获取数据
     async getShowDatas() {
       try {
-        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs()])
+        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs(),getShowDataForBanner()])
         res.forEach(item => {
           let data = item.data.data;
           Object.entries(data).forEach(([key, value]) => {

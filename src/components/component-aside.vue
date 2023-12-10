@@ -2,10 +2,10 @@
   <div id="aside">
     <el-menu
     :collapse="IsCollapse"
-    background-color="#545c64"
+    background-color="#333"
     text-color="#fff"
     active-text-color="#ffd04b"
-    default-active="2"
+    :default-active="$route.name"
     class="el-menu-vertical-demo"
     @open="handleOpen"
     @close="handleClose"
@@ -13,7 +13,7 @@
   >
     <h3 class="el-h3">{{ IsCollapse ? "后台" : "网络专业宣传管理" }}</h3>
     <!-- 无子菜单 -->
-    <el-menu-item
+    <el-menu-item v-if="item.label ==='数据展示'"
       @click="clickMenu(item)"
       :index="item.name"
       v-for="(item, index) in noChildrenMenu"
@@ -22,9 +22,9 @@
       <i :class="`el-icon-${item.icon}`"></i>
       <span slot="title">{{ item.label }}</span>
     </el-menu-item>
-
     <!-- 有子菜单 -->
-    <el-submenu
+
+    <el-submenu  
       v-for="item in hasChildrenMenu"
       :key="item.label"
       class="user-item"
@@ -44,7 +44,14 @@
       </el-menu-item-group>
       
     </el-submenu>
-
+    <el-menu-item  v-if="item.label !=='数据展示'"
+      @click="clickMenu(item)"
+      :index="item.name"
+      v-for="(item, index) in noChildrenMenu"
+      :key="item.name"
+    >   <i :class="`el-icon-${item.icon}`"></i>
+    <span slot="title">{{ item.label }}</span>
+  </el-menu-item>
     
   </el-menu>
   </div>
@@ -58,6 +65,8 @@ export default {
     return {
     };
   },
+  mounted() {
+  },  
   computed: {
     ...mapState("tapAside", ["IsCollapse","Menus"]),
     

@@ -216,11 +216,12 @@ export default {
             .then(() => {
                delNews({ id: row.id }).then(() => {
                   this.getNewsList();
-               });
-               this.$message({
+                  this.$message({
                   type: "success",
                   message: "删除成功!",
                });
+               }).catch(e => console.log(e));
+              
             })
             .catch(() => {
                this.$message({

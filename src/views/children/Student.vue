@@ -1,7 +1,7 @@
 <template>
     <div id="Home">
       <el-row>
-        新闻管理
+        Student
       </el-row>
     </div>
   </template>

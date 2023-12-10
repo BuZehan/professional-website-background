@@ -44,3 +44,16 @@ export const getShowData = (data) => request("/news/getNewsCount","get", data)
 export const getShowDataForTzgg = (data) => request("/notification/getNotificationCount","get", data)
 // 获奖证书
 export const getShowDataForHjzs = (data) => request("/honor/getHonorCount","get", data)
+// Banner轮播图
+export const getShowDataForBanner = (data) => request("/swiper/getBannerCount","get", data)
+
+
+// Banner接口
+//添加Banner
+export const addBanner = (data,params) => request("/swiper/add","post", data,{headers:{'Content-Type': 'multipart/form-data'}})
+// 获取Banner
+export const getBanner = (data) => request("/swiper/getBanner","get", data)
+// 编辑Banner
+export const editBanner = (data) => request("/swiper/editBanner","post", data,{headers:{'Content-Type': 'multipart/form-data'}})
+// 删除Banner
+export const delBanner = (data) => request("/swiper/delBanner","post", data)
