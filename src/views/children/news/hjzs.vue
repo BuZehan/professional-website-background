@@ -25,8 +25,8 @@
                             <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="1"
                                 :before-remove="handleRemove" :file-list="fileList" list-type="picture" :auto-upload="false"
                                 :http-request="uploadFiles">
-                                <el-button size="small" type="primary">点击上传1张证书图片</el-button>
-                                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
+                                <el-button size="small" type="primary">点击上传图片</el-button>
+                                <div slot="tip" class="el-upload__tip">只能上传1张证书图片</div>
                             </el-upload>
                         </el-form-item>
                     </el-form>
@@ -60,7 +60,7 @@
             <div class="manger">
                 <template>
                     <el-table height="605px" :data="tableData" style="width: 100%">
-                        <el-table-column prop="news_title" label="证书标题"> </el-table-column>
+                        <el-table-column prop="news_title" label="证书标题" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="news_content" label="证书内容" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="news_type" label="证书类型"> </el-table-column>

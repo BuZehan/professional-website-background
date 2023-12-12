@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getCode ,getShowDataForBanner} from "@/api";
+import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getShowDataForAlumni ,getShowDataForBanner,getShowDataForTeacher} from "@/api";
 
 export default {
   name: "Home",
@@ -16,8 +16,8 @@ export default {
         tzgg: 0,
         hjzs: 0,
         swiper: 3,
-        stu: 8,
-        teacher: 6
+        stuNum: 8,
+        teacherNum: 6,
       }
     };
   },
@@ -52,8 +52,8 @@ export default {
               { value: this.newsData.tzgg, name: '通知公告' },
               { value: this.newsData.hjzs, name: '获奖证书' },
               { value: this.newsData.swiper, name: '首页轮播图' },
-              { value: this.newsData.stu, name: '优秀校友' },
-              { value: this.newsData.teacher, name: '教师数据' },
+              { value: this.newsData.stuNum, name: '优秀校友' },
+              { value: this.newsData.teacherNum, name: '教师数据' },
             ],
             emphasis: {
               itemStyle: {
@@ -69,7 +69,7 @@ export default {
     // 获取数据
     async getShowDatas() {
       try {
-        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs(),getShowDataForBanner()])
+        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs(),getShowDataForBanner(),getShowDataForAlumni(),getShowDataForTeacher()])
         res.forEach(item => {
           let data = item.data.data;
           Object.entries(data).forEach(([key, value]) => {

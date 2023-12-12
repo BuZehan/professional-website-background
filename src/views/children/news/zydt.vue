@@ -6,21 +6,17 @@
                <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="55%" size="mini"
                   :before-close="handleColse">
                   <!-- 新闻标题 -->
-                  <el-form-item style="width: 200px" prop="news_title" label="新闻标题">
-                     <el-input placeholder="请输入新闻标题" v-model="form.news_title"></el-input>
+                  <el-form-item style="width: 200px" prop="title" label="新闻标题">
+                     <el-input placeholder="请输入新闻标题" v-model="form.title"></el-input>
                   </el-form-item>
-                  <!-- 新闻内容 -->
-                  <el-form-item prop="news_content" label="新闻内容" style="width: 800px !important;">
-                     <el-input type="textarea" placeholder="请输入新闻内容" v-model="form.news_content"></el-input>
-                  </el-form-item>
-                  <el-form-item style="width: 800px !important;">
-                     <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="9"
-                        :before-remove="handleRemove" :file-list="fileList" list-type="picture" :auto-upload="false"
-                        :http-request="uploadFiles">
-                        <el-button size="small" type="primary">点击上传</el-button>
-                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
-                     </el-upload>
-                  </el-form-item>
+                  <div style="border: 1px solid #ccc;">
+                     <Toolbar style="border-bottom: 1px solid #ccc" :editor="editor" :defaultConfig="toolbarConfig"
+                        :mode="mode" />
+                     <Editor style="height: 400px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
+                        :mode="mode" @onCreated="onCreated" @onChange="onChange" @onDestroyed="onDestroyed"
+                        @onMaxLength="onMaxLength" @onFocus="onFocus" @onBlur="onBlur" @customAlert="customAlert"
+                        @customPaste="customPaste" />
+                  </div>
                </el-form>
             </div>
             <div slot="footer" class="dialog-footer">
@@ -33,27 +29,19 @@
             <el-button @click="handleAdd" type="primary" size="mini">
                +新增
             </el-button>
-            <el-form :inline="true" :model="userForm" class="demo-form-inline">
-               <el-form-item>
-                  <el-input size="mini" v-model="userForm.name" placeholder="请输入名称"></el-input>
-               </el-form-item>
-               <el-form-item class="btn">
-                  <el-button type="primary" @click="searchUser" size="mini">查询</el-button>
-               </el-form-item>
-            </el-form>
          </div>
 
          <!-- 表格数据 -->
          <div class="manger">
             <template>
                <el-table height="500px" :data="tableData" style="width: 100%">
-                  <el-table-column prop="news_title" label="新闻标题"> </el-table-column>
-                  <el-table-column prop="news_content" label="新闻内容" :show-overflow-tooltip="true"> </el-table-column>
+                  <el-table-column prop="title" label="新闻标题" :show-overflow-tooltip="true"> </el-table-column>
+                  <!-- <el-table-column prop="content" label="新闻内容" :show-overflow-tooltip="true"> </el-table-column> -->
                   <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
                   <el-table-column label="图片">
                      <template slot-scope="scope">
-                        <div style="display: flex;"><template v-for="(item, index) in scope.row.images">
-                              <el-image :preview-src-list="scope.row.images" v-if="item" :src="item"
+                        <div style="display: flex;"><template v-for="(item, index) in scope.row.imageList">
+                              <el-image :preview-src-list="scope.row.imageList" v-if="item" :src="item"
                                  style="width: 40px;margin:0 4px;" />
                            </template></div>
                      </template>
@@ -79,15 +67,19 @@
 </template>
  
 <script>
-import { getNews, addNews, editNews, delNews, uoloadFiles } from "@/api";
-export default {
+import Vue from 'vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import { getNews, addNews, editNewsOfEditor, delNews, uoloadFiles, addNewsOfEditor } from "@/api";
+export default Vue.extend({
    name: "zydt",
+   components: { Editor, Toolbar },
    data() {
       return {
          dialogVisible: false,
          form: {
-            news_title: "",
-            news_content: "",
+            title: "",
+            editorData: "",
+            imageList: []
          },
          rules: {
             name: [{ required: true, message: "请输入新闻标题" }],
@@ -98,13 +90,40 @@ export default {
          total: 0,
          pageData: {
             page: 1,//当前页码
-            limit: 20//当前页码数据条数
+            limit: 10//当前页码数据条数
          },
-         userForm: {
-            name: ''
+         editor: null,
+         toolbarConfig: {     // 菜单栏配置
+            toolbarKeys: [
+               "uploadImage",  // 上传图片
+            ]
          },
-         fileList: [],
-         fileData: null
+         html: '<p>hello</p>',
+         toolbarConfig: {},
+         editorConfig: { placeholder: '请输入内容...' },
+         mode: 'default', // or 'simple'
+         editorConfig: {
+            MENU_CONF: {
+               uploadImage: {
+                  withCredentials: true,
+                  fieldName: '新闻图片',
+                  // base64LimitSize: 1024 * 1024 * 10, // 20MB 小于该值就插入 base64 格式（而不    上传），默认为 0
+                  customUpload: async (file, insertFn) => {  // TS 语法
+                     // 自己实现上传，并得到图片 url alt href
+                     let formData = new FormData();
+                     formData.append('files', file);
+                     let res = await uoloadFiles(formData)
+                     // 最后插入图片
+                     // console.log(res);
+                     let { url, alt, href } = res.data.data
+                     insertFn(url, alt, href)
+                     this.form.imageList.push(url)
+                  }
+               },
+            }
+            // 其他属性...
+         }
+
       };
    },
    methods: {
@@ -116,36 +135,25 @@ export default {
       },
       //点击表单提交操作
       handleSubmit() {
-         this.$refs.form.validate((bool, obj) => {
+         this.$refs.form.validate(async (bool, obj) => {
             if (bool) {
                //表单数据完整 进行执行
                if (this.modelState == 0) {
                   //modelState 为0 添加用户
-                  this.$refs.upload.submit();
-                  this.fileData = this.fileData ? this.fileData : new FormData();
-                  this.fileData.append("formData", JSON.stringify(this.form))
-                  this.form = {
-                     news_title: "",
-                     news_content: "",
-                  }
-                  addNews(this.fileData).then((res) => {
-                     //成功添加 再次获取列表数据
-                     if (res.data.code === 200) {
-                        // setTimeout(() => {
-                        this.getNewsList()
-                        this.fileData = new FormData();
-                        // }, 1000);
-                     }
-                  });
+                  // 富文本编辑器
+                  let resHtml = this.editor.getHtml();  // 获取文章html结构（带有内联样式）
+                  console.log('获取文章html结构', resHtml);
+                  this.form.editorData = resHtml
+                  let res = await addNewsOfEditor(this.form)
+                  console.log(res.data);
+                  this.getNewsList()
                } else {
                   try {
-                     this.$refs.upload.submit();
-                     this.fileData = this.fileData ? this.fileData : new FormData();
-                     this.fileData.append("formData", JSON.stringify(this.form))
-                     editNews(this.fileData).then(res => {
+                     let resHtml = this.editor.getHtml();  // 获取文章html结构（带有内联样式）
+                     this.form.content = resHtml
+                     editNewsOfEditor(this.form).then(res => {
                         if (res.data.code === 200) {
                            this.getNewsList()
-                           this.fileData = new FormData();
                         }
                      }).catch(err => console.log(err));
                   } catch (error) {
@@ -160,7 +168,7 @@ export default {
       // 删除图片
       handleRemove(file, fileList) {
          this.fileList = fileList;
-         this.form.images = fileList
+         this.form.imageList = fileList
       },
       handleColse() {
          this.$refs.form.resetFields();
@@ -171,13 +179,28 @@ export default {
       },
       //获取news数据
       async getNewsList() {
-         let res = await getNews({ ...this.userForm, ...this.pageData });
+         let res = await getNews({ ...this.pageData });
+         console.log(res.data);
          this.tableData = res.data.list.map(item => {
+            // console.log(JSON.parse(item.image_list));
+            let imageList = item.image_list ? JSON.parse(item.image_list) : [];
+            // 匹配<img />标签的个数
+            const imgCount = (item.content?.match(/<img\s.*?>/g) || []).length;
+
+            // 匹配<img />标签的href链接
+            const hrefList = item.content?.match(/<img\s.*?src="(.*?)".*?>/g)?.map(imgTag => {
+               const hrefMatch = imgTag.match(/src="(.*?)"/);
+               return hrefMatch ? hrefMatch[1] : '';
+            });
+
+            // console.log('图片个数:', imgCount);
+            // console.log('href链接:', hrefList);
+            // console.log('返回图片：',imageList);
             return {
                id: item.id,
-               images: item.images.map(img => img.image_path),
-               news_title: item.news_title,
-               news_content: item.news_content,
+               imageList:hrefList?.filter(url => imageList.includes(url)),
+               title: item.title,
+               content: item.content,
                release_time: item.release_time,
             };
          });
@@ -185,11 +208,12 @@ export default {
       },
       //添加新闻
       handleAdd() {
-         this.fileList = []
          this.form = {
-            news_title: "",
-            news_content: "",
+            title: "",
+            editorData: "",
+            imageList: []
          }
+         this.html = ''
          this.modelState = 0;
          this.dialogVisible = true;
       },
@@ -198,13 +222,8 @@ export default {
          this.modelState = 1;
          this.dialogVisible = true;
          this.form = JSON.parse(JSON.stringify(row));
-         this.fileList  = row.images.filter(obj => obj).map(item => {
-            return {
-               url: item,
-               name: row.news_title,
-            }
-         })
-
+         this.html = row.content
+         console.log(row, this.form);
       },
       //删除数据操作
       handleDelete(row) {
@@ -217,11 +236,11 @@ export default {
                delNews({ id: row.id }).then(() => {
                   this.getNewsList();
                   this.$message({
-                  type: "success",
-                  message: "删除成功!",
-               });
+                     type: "success",
+                     message: "删除成功!",
+                  });
                }).catch(e => console.log(e));
-              
+
             })
             .catch(() => {
                this.$message({
@@ -238,16 +257,51 @@ export default {
       //查询用户信息
       searchUser() {
          this.getNewsList()
-      }
+      },
+      onCreated(editor) {
+         this.editor = Object.seal(editor)
+         // console.log('onCreated', editor)
+      },
+      onChange(editor) {
+         console.log('onChange', editor.children)
+      },
+      onDestroyed(editor) { console.log('onDestroyed', editor) },
+      onMaxLength(editor) { console.log('onMaxLength', editor) },
+      onFocus(editor) { console.log('onFocus', editor) },
+      onBlur(editor) { console.log('onBlur', editor) },
+      customAlert(info, type) { window.alert(`customAlert in Vue demo\n${type}:\n${info}`) },
+      customPaste(editor, event, callback) {
+         console.log('ClipboardEvent 粘贴事件对象', event)
+         // const html = event.clipboardData.getData('text/html') // 获取粘贴的 html
+         const text = event.clipboardData.getData('text/plain') // 获取粘贴的纯文本
+         // const rtf = event.clipboardData.getData('text/rtf') // 获取 rtf 数据（如从 word wsp 复制粘贴）
+
+         // 自定义插入内容
+         editor.insertText(text)
+
+         // 返回 false ，阻止默认粘贴行为
+         event.preventDefault()
+         callback(false) // 返回值（注意，vue 事件的返回值，不能用 return）
+         // 返回 true ，继续默认的粘贴行为
+         // callback(true)
+      },
    },
    mounted() {
       this.getNewsList();
    },
+   beforeDestroy() {
+      const editor = this.editor
+      if (editor == null) return
+      editor.destroy() // 组件销毁时，及时销毁编辑器
+   },
    computed: {
 
-   }
-};
+   },
+})
 </script>
+
+<style src="@wangeditor/editor/dist/css/style.css"></style>
+
 <style>
 .el-tooltip__popper {
    max-width: 20%

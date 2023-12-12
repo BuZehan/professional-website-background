@@ -1,120 +1,303 @@
 <template>
-    <div id="Home">
-      <el-row>
-        Student
-      </el-row>
-    </div>
-  </template>
-  
-  <script>
-  import { reqData } from "@/api";
-  export default {
-    name: "Home",
-    data() {
-      return {
-     
-      };
-    },
-    mounted() {
-    },
-    methods: {
-    
-    },
-  };
-  </script>
-  
-  <style scoped lang="less">
-  .UserInfo {
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-    }
-    .user-info-txt {
-      margin-left: 50px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      span {
-        padding-top: 5px;
-        font-size: 13px;
-        color: #aaa;
-      }
-    }
+  <div id="User">
+     <div class="manage">
+        <el-dialog title="校友管理" :visible.sync="dialogVisible">
+           <div id="Forms">
+              <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="55%" size="mini"
+                 :before-close="handleColse">
+                 <!-- 学生表单标题 -->
+                 <el-form-item style="width: 200px" prop="news_title" label="校友标题">
+                    <el-input placeholder="请输入校友标题" v-model="form.student_name"></el-input>
+                 </el-form-item>
+                 <!-- 学生表单内容 -->
+                 <el-form-item prop="news_content" label="校友内容" style="width: 800px !important;">
+                    <el-input type="textarea" placeholder="请输入校友内容" v-model="form.student_desc"></el-input>
+                 </el-form-item>
+                 <el-form-item style="width: 200px" prop="grade" label="毕业年份">
+                  <el-input placeholder="请输入毕业年份" v-model="form.grade"></el-input>
+               </el-form-item>
+                 <el-form-item style="width: 800px !important;">
+                    <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="9"
+                       :before-remove="handleRemove" :file-list="fileList" list-type="picture" :auto-upload="false"
+                       :http-request="uploadFiles">
+                       <el-button size="small" type="primary">点击上传图片</el-button>
+                       <div slot="tip" class="el-upload__tip">最多上传9张图片</div>
+                    </el-upload>
+                 </el-form-item>
+              </el-form>
+           </div>
+           <div slot="footer" class="dialog-footer">
+              <el-button @click="cancle" size="mini">取 消</el-button>
+              <el-button type="primary" size="mini" @click="handleSubmit">确 定</el-button>
+           </div>
+        </el-dialog>
+
+        <div class="manage-header">
+           <el-button @click="handleAdd" type="primary" size="mini">
+              +新增
+           </el-button>
+           <!-- <el-form :inline="true" :model="userForm" class="demo-form-inline">
+              <el-form-item>
+                 <el-input size="mini" v-model="userForm.name" placeholder="请输入名称"></el-input>
+              </el-form-item>
+              <el-form-item class="btn">
+                 <el-button type="primary" @click="searchUser" size="mini">查询</el-button>
+              </el-form-item>
+           </el-form> -->
+        </div>
+
+        <!-- 表格数据 -->
+        <div class="manger">
+           <template>
+              <el-table height="500px" :data="tableData" style="width: 100%">
+                 <el-table-column prop="student_name" label="校友标题" :show-overflow-tooltip="true"> </el-table-column>
+                 <el-table-column prop="student_desc" label="校友描述" :show-overflow-tooltip="true"> </el-table-column>
+                 <!-- <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column> -->
+                 <el-table-column prop="grade" label="毕业时间" :show-overflow-tooltip="true"> </el-table-column>
+                 <el-table-column label="图片">
+                    <template slot-scope="scope">
+                       <div style="display: flex;"><template v-for="(item, index) in scope.row.images">
+                             <el-image :preview-src-list="scope.row.images" v-if="item" :src="item"
+                                style="width: 40px;margin:0 4px;" />
+                          </template></div>
+                    </template>
+                 </el-table-column>
+
+                 <el-table-column label="操作">
+                    <template slot-scope="scope">
+                       <el-button size="mini" @click="handleChange(scope.row)">编辑</el-button>
+                       <el-button size="mini" @click="handleDelete(scope.row)" type="danger">删除</el-button>
+                    </template>
+                 </el-table-column>
+              </el-table>
+           </template>
+           <!-- 分页器 -->
+           <div class="elPagination">
+              <el-pagination layout="prev, pager, next" :total='total' @current-change="changePage">
+              </el-pagination>
+           </div>
+        </div>
+
+     </div>
+  </div>
+</template>
+
+<script>
+import { addStu,getStu,editStu,delStu } from "@/api";
+export default {
+  name: "zydt",
+  data() {
+     return {
+        dialogVisible: false,
+        form: {
+          student_name: "",
+           student_desc: "",
+           grade:""
+        },
+        rules: {
+           name: [{ required: true, message: "请输入校友姓名" }],
+           addr: [{ required: true, message: "请输入校友描述" }],
+        },
+        tableData: [],
+        modelState: 0, //新增用户和编辑用户的状态控制
+        total: 0,
+        pageData: {
+           page: 1,//当前页码
+           limit: 20//当前页码数据条数
+        },
+        fileList: [],
+        fileData: null
+     };
+  },
+  methods: {
+     uploadFiles(res) {
+        // 向formData对象中添加要上传的文件
+        this.fileData = this.fileData ? this.fileData : new FormData();
+        this.fileData.append('files', res.file)
+        // console.log("files:", res);
+     },
+     //点击表单提交操作
+     handleSubmit() {
+        this.$refs.form.validate((bool, obj) => {
+           if (bool) {
+              //表单数据完整 进行执行
+              if (this.modelState == 0) {
+                 //modelState 为0 添加用户
+                 this.$refs.upload.submit();
+                 this.fileData = this.fileData ? this.fileData : new FormData();
+                 this.fileData.append("formData", JSON.stringify(this.form))
+                 this.form = {
+                    student_title: "",
+                    student_content: "",
+                 }
+                 addStu(this.fileData).then((res) => {
+                    //成功添加 再次获取列表数据
+                    if (res.data.code === 200) {
+                       this.getStuList()
+                       this.fileData = new FormData();
+                    }
+                 });
+              } else {
+                 try {
+                    this.$refs.upload.submit();
+                    this.fileData = this.fileData ? this.fileData : new FormData();
+                    this.fileData.append("formData", JSON.stringify(this.form))
+                    editStu(this.fileData).then(res => {
+                       if (res.data.code === 200) {
+                          this.getStuList()
+                          this.fileData = new FormData();
+                       }
+                    }).catch(err => console.log(err));
+                 } catch (error) {
+                    console.log(error);
+                 }
+
+              }
+              this.handleColse(); //关闭弹窗
+           }
+        });
+     },
+     // 删除图片
+     handleRemove(file, fileList) {
+        this.fileList = fileList; 
+        this.form.images = fileList
+     },
+     handleColse() {
+        this.$refs.form.resetFields();
+        this.dialogVisible = false;
+     },
+     cancle() {
+        this.handleColse();
+     },
+     //获取数据
+     async getStuList() {
+        let res = await getStu({...this.pageData });
+        this.tableData = res.data.list.map(item => {
+           return {
+              id: item.id,
+              images: item.studentImage.map(img => img.image_path),
+              student_name: item.student_name,
+              student_desc: item.student_desc,
+              release_time: item.release_time,
+              grade:item.grade
+           };
+        });
+        this.total = res.data.total || 0
+     },
+     //添加
+     handleAdd() {
+        this.fileList = []
+        this.form = {
+           student_name: "",
+           student_desc: "",
+           grade:''
+        }
+        this.modelState = 0;
+        this.dialogVisible = true;
+     },
+     //修改信息
+     async handleChange(row) {
+        this.modelState = 1;
+        this.dialogVisible = true;
+        this.form = JSON.parse(JSON.stringify(row));
+        this.fileList  = row.images.filter(obj => obj).map(item => {
+           return {
+              url: item,
+              name: row.news_title,
+           }
+        })
+
+     },
+     //删除数据操作
+     handleDelete(row) {
+        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+           confirmButtonText: "确定",
+           cancelButtonText: "取消",
+           type: "warning",
+        })
+           .then(() => {
+            console.log(row.id);
+            delStu({ id: row.id }).then(() => {
+                 this.getStuList();
+                 this.$message({
+                 type: "success",
+                 message: "删除成功!",
+              });
+              }).catch(e => e);
+             
+           })
+           .catch(() => {
+              this.$message({
+                 type: "info",
+                 message: "已取消删除",
+              });
+           });
+     },
+     //点击分页器
+     changePage(val) {
+        this.pageData.page = val
+        this.getBannerList()
+     },
+     //查询用户信息
+     searchUser() {
+        this.getBannerList()
+     }
+  },
+  mounted() {
+     this.getStuList();
+  },
+  computed: {
+
   }
-  .login-info {
-    padding-top: 15px;
-    height: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-around;
-    p {
-      font-size: 13px;
-      color: #999;
-      span {
-        margin-left: 50px;
-      }
-    }
+};
+</script>
+<style>
+.el-tooltip__popper {
+  max-width: 20%
+}
+</style>
+<style scoped lang="less">
+.el-form {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.el-tooltip__popper {
+  max-width: 20%
+}
+
+.el-form-item {
+  width: 280px !important;
+}
+
+.manage-header {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+
+.manger {
+  width: 90%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.elPagination {
+  right: 20px;
+  position: absolute;
+  margin-top: 50px;
+}
+
+.demo-form-inline {
+  margin-left: 50px;
+
+  .btn {
+     width: 80px !important;
   }
-  .box-card {
-    margin-bottom: 20px;
-    height: 250px;
-  }
-  .cards {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-evenly;
-    .el-card {
-      width: 30%;
-      height: 80px;
-      margin-bottom: 15px;
-    }
-    .icon-outer {
-      width: 40px;
-      height: 40px;
-      text-align: center;
-      line-height: 40px;
-      background-color: #aaa;
-      border-radius: 4px;
-      margin: 0;
-    }
-    .detail {
-      margin-left: 20px;
-      p {
-        font-size: 15px;
-      }
-      span {
-        font-size: 12px;
-        color: #999;
-      }
-    }
-  }
-  #content {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .mid-card {
-    width: 95%;
-    margin: 10px auto;
-    margin-top: 5px;
-    height: 280px;
-  }
-  .two-card {
-    display: flex;
-    justify-content: space-between;
-    height: 200px;
-    width: 95%;
-    margin: 0 auto;
-    .el-card {
-      width: 48%;
-      margin-top: 10px;
-    }
-  }
-  </style>
-  
+}
+</style>
