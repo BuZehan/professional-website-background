@@ -1,18 +1,18 @@
 <template>
    <div id="User">
       <div class="manage">
-         <el-dialog title="新闻管理" :visible.sync="dialogVisible">
+         <!-- 新闻编辑 -->
+         <el-dialog title="新闻编辑" :visible.sync="dialogVisible" top='2vh' :close-on-click-modal="false">
             <div id="Forms">
-               <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="55%" size="mini"
+               <el-form ref="form" :rules="rules" label-position="left" :model="form" label-width="100px" width="100%" size="mini"
                   :before-close="handleColse">
-                  <!-- 新闻标题 -->
-                  <el-form-item style="width: 200px" prop="title" label="新闻标题">
-                     <el-input placeholder="请输入新闻标题" v-model="form.title"></el-input>
-                  </el-form-item>
+                  <el-form-item  prop="title" label="新闻标题：">
+                     <el-input placeholder="请输入标题" v-model="form.title"></el-input>
+                   </el-form-item>
                   <div style="border: 1px solid #ccc;">
                      <Toolbar style="border-bottom: 1px solid #ccc" :editor="editor" :defaultConfig="toolbarConfig"
                         :mode="mode" />
-                     <Editor style="height: 400px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
+                     <Editor style="height: 700px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
                         :mode="mode" @onCreated="onCreated" @onChange="onChange" @onDestroyed="onDestroyed"
                         @onMaxLength="onMaxLength" @onFocus="onFocus" @onBlur="onBlur" @customAlert="customAlert"
                         @customPaste="customPaste" />
@@ -21,7 +21,7 @@
             </div>
             <div slot="footer" class="dialog-footer">
                <el-button @click="cancle" size="mini">取 消</el-button>
-               <el-button type="primary" size="mini" @click="handleSubmit">确 定</el-button>
+               <el-button type="primary" size="mini" @click="handleSubmit">提 交</el-button>
             </div>
          </el-dialog>
 
@@ -75,6 +75,7 @@ export default Vue.extend({
    components: { Editor, Toolbar },
    data() {
       return {
+         // 新闻编辑
          dialogVisible: false,
          form: {
             title: "",
@@ -127,6 +128,7 @@ export default Vue.extend({
       };
    },
    methods: {
+
       uploadFiles(res) {
          // 向formData对象中添加要上传的文件
          this.fileData = this.fileData ? this.fileData : new FormData();
@@ -180,7 +182,7 @@ export default Vue.extend({
       //获取news数据
       async getNewsList() {
          let res = await getNews({ ...this.pageData });
-         console.log(res.data);
+         // console.log(res.data);
          this.tableData = res.data.list.map(item => {
             // console.log(JSON.parse(item.image_list));
             let imageList = item.image_list ? JSON.parse(item.image_list) : [];
@@ -192,13 +194,42 @@ export default Vue.extend({
                const hrefMatch = imgTag.match(/src="(.*?)"/);
                return hrefMatch ? hrefMatch[1] : '';
             });
+            // const str = item.content;
 
+            // 使用正则表达式匹配<h1>到<h6>标签，并提取其中的内容
+            // const regex = /<h([1-6])[^>]*>(.*?)<\/h\1>/g;
+            // const matches = str.match(regex);
+            // 遍历匹配结果，并将标题类型存入数组中
+            // const titles = [];
+            // if (matches) {
+            //    matches.forEach(match => {
+            //       const titleType = match.replace(/<\/?h[1-6][^>]*>/g, '');
+            //       titles.push(titleType);
+            //    });
+            // }
+
+            // console.log(titles);
             // console.log('图片个数:', imgCount);
             // console.log('href链接:', hrefList);
             // console.log('返回图片：',imageList);
+
+            // 使用正则表达式匹配标签内的内容.
+            // 去除标签和属性，获取内容
+            // let H = []
+            // const regex1 = /<[^>]+>([^<]*)<\/[^>]+>/g;
+            // if(titles.length !== 0){
+            //    const matches1 = titles[0].matchAll(regex1) ;
+            //    for (let match of matches1) {
+            //    console.log('####',match);
+            //    const content = match[1].replace(/[\n\r\t]/g, '').trim().replace(/&nbsp;/g, '') || "---"
+            //    H.push(content);
+            // }
+            // }
+            // console.log('标题：###',H[0],H);
             return {
                id: item.id,
-               imageList:hrefList?.filter(url => imageList.includes(url)),
+               imageList: hrefList,
+               // imageList: hrefList?.filter(url => imageList.includes(url)),
                title: item.title,
                content: item.content,
                release_time: item.release_time,
@@ -319,7 +350,8 @@ export default Vue.extend({
 }
 
 .el-form-item {
-   width: 280px !important;
+   width: 100% !important;
+
 }
 
 .manage-header {
@@ -331,7 +363,7 @@ export default Vue.extend({
 }
 
 .manger {
-   width: 90%;
+   width: 100%;
    margin: 0 auto;
    position: relative;
 }
@@ -350,4 +382,7 @@ export default Vue.extend({
    }
 }
 </style>
- 
+ <!--    /deep/ .el-form-item__label{
+      text-align: start;
+      width: fit-content;
+   } -->

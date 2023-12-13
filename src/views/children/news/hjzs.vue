@@ -23,10 +23,12 @@
                         </el-form-item>
                         <el-form-item style="width: 800px !important;">
                             <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="1"
-                                :before-remove="handleRemove" :file-list="fileList" list-type="picture" :auto-upload="false"
+                                :before-remove="handleRemove" :file-list="fileList" list-type="text" :auto-upload="false"
                                 :http-request="uploadFiles">
-                                <el-button size="small" type="primary">点击上传图片</el-button>
-                                <div slot="tip" class="el-upload__tip">只能上传1张证书图片</div>
+                                <el-button size="small" type="primary">点击上传1份证书附件</el-button>
+                                <div slot="tip" class="el-upload__tip">
+                                    附件（pdf、doc、图片等）
+                                </div>
                             </el-upload>
                         </el-form-item>
                     </el-form>
@@ -63,17 +65,26 @@
                         <el-table-column prop="news_title" label="证书标题" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="news_content" label="证书内容" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
-                        <el-table-column prop="news_type" label="证书类型"> </el-table-column>
-
-                        <el-table-column label="证书图片">
+                        <el-table-column prop="type" label="证书类型"> </el-table-column>
+                        <el-table-column label="证书文件">
                             <template slot-scope="scope">
-                                <div style="display: flex;"><template v-for="(item, index) in scope.row.images">
-                                        <el-image :preview-src-list="scope.row.images" v-if="item" :src="item"
+                                <div style="display: flex;">
+                                    <template v-for="(item, index) in scope.row.images">
+                                       
+
+                                        <a style="text-decoration: none;color: #333; display:flex;" :href="scope.row.images[0]"
+                                            target="_blank"
+                                            v-if="fileType.includes(scope.row.images[0].match(/\.([^.]+)$/)[1])">
+                                            <!-- {{ scope.row.images[0].match(/\.([^.]+)$/)[1] }} -->
+                                            附件
+                                            <el-image style="width: 20px;" :src="linkIcon" />
+                                        </a>
+                                        <el-image v-else :preview-src-list="scope.row.images" :src="item"
                                             style="width: 40px;margin:0 4px;" />
-                                    </template></div>
+                                    </template>
+                                </div>
                             </template>
                         </el-table-column>
-
                         <el-table-column label="操作">
                             <template slot-scope="scope">
                                 <el-button size="mini" @click="handleChange(scope.row)">编辑</el-button>
@@ -99,6 +110,8 @@ export default {
     name: "hjzs",
     data() {
         return {
+            linkIcon:require('@/assets/link.png'),
+            fileType: ['pdf', 'doc', 'docx'],
             dialogVisible: false,
             form: {
                 news_title: "",
@@ -117,7 +130,7 @@ export default {
                 limit: 10//当前页码数据条数
             },
             filterDataForm: {
-                type: ["学生证书","教师证书","学院证书"]
+                type: ["学生证书", "教师证书", "学院证书"]
             },
             fileList: [],
             fileData: null
@@ -195,7 +208,7 @@ export default {
                     news_title: item.news_title,
                     news_content: item.news_content,
                     release_time: item.release_time,
-                    news_type: item.type,
+                    type: item.type,
                 };
             });
             // console.log(res);

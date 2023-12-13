@@ -68,11 +68,13 @@ export const delBanner = (data) => request("/swiper/delBanner", "post", data)
 //添加学生信息
 export const addStu = (data, params) => request("/stu/add", "post", data, { headers: { 'Content-Type': 'multipart/form-data' } })
 // 获取学生信息
-export const getStu = (data) => request("/stu/getStu", "get", data)
+export const getStuOfEditor = (data) => request("/stu/getStu", "get", data)
 // 编辑学生信息
-export const editStu = (data) => request("/stu/editStu", "post", data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const editStuOfEditor = (data) => request("/stu/editStu", "post", data, { headers: { 'Content-Type': 'multipart/form-data' } })
 // 删除学生信息
 export const delStu = (data) => request("/stu/delStu", "post", data)
+//上传文件
+export const uoloadFilesForStu = (data) => request("/stu/upload", "post", data, { headers: { 'Content-Type': 'multipart/form-data' } })
 
 // 教师接口
 //添加学生信息

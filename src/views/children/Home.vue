@@ -51,7 +51,7 @@ export default {
               { value: this.newsData.xwdt, name: '新闻动态' },
               { value: this.newsData.tzgg, name: '通知公告' },
               { value: this.newsData.hjzs, name: '获奖证书' },
-              { value: this.newsData.swiper, name: '首页轮播图' },
+              // { value: this.newsData.swiper, name: '首页轮播图' },
               { value: this.newsData.stuNum, name: '优秀校友' },
               { value: this.newsData.teacherNum, name: '教师数据' },
             ],
