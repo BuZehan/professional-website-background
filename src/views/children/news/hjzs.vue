@@ -61,7 +61,7 @@
             <!-- 表格数据 -->
             <div class="manger">
                 <template>
-                    <el-table height="605px" :data="tableData" style="width: 100%">
+                    <el-table height="400px" :data="tableData" style="width: 100%">
                         <el-table-column prop="news_title" label="证书标题" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="news_content" label="证书内容" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
@@ -70,14 +70,12 @@
                             <template slot-scope="scope">
                                 <div style="display: flex;">
                                     <template v-for="(item, index) in scope.row.images">
-                                       
-
                                         <a style="text-decoration: none;color: #333; display:flex;" :href="scope.row.images[0]"
                                             target="_blank"
                                             v-if="fileType.includes(scope.row.images[0].match(/\.([^.]+)$/)[1])">
                                             <!-- {{ scope.row.images[0].match(/\.([^.]+)$/)[1] }} -->
                                             附件
-                                            <el-image style="width: 20px;" :src="linkIcon" />
+                                            <el-image style="width: 16px;height: 17px;margin-top: 2px;" :src="linkIcon" />
                                         </a>
                                         <el-image v-else :preview-src-list="scope.row.images" :src="item"
                                             style="width: 40px;margin:0 4px;" />
@@ -116,10 +114,11 @@ export default {
             form: {
                 news_title: "",
                 news_content: "",
+                file_name:'',
                 type: ""
             },
             rules: {
-                name: [{ required: true, message: "请输入新闻标题" }],
+                news_title: [{ required: true, message: "请输入标题" }],
                 addr: [{ required: true, message: "请输入新闻内容" }],
             },
             tableData: [],
@@ -127,7 +126,7 @@ export default {
             total: 0,
             pageData: {
                 page: 1,//当前页码
-                limit: 10//当前页码数据条数
+                limit: 6//当前页码数据条数
             },
             filterDataForm: {
                 type: ["学生证书", "教师证书", "学院证书"]
@@ -139,8 +138,10 @@ export default {
     methods: {
         uploadFiles(res) {
             // 向formData对象中添加要上传的文件
+            console.log(res);
             this.fileData = this.fileData ? this.fileData : new FormData();
             this.fileData.append('files', res.file)
+            this.form.file_name = res.file.name
             // console.log("files:", res);
         },
         //点击表单提交操作
@@ -208,6 +209,7 @@ export default {
                     news_title: item.news_title,
                     news_content: item.news_content,
                     release_time: item.release_time,
+                    file_name: item.honorImage.map(img => img.image_name),
                     type: item.type,
                 };
             });
@@ -229,10 +231,11 @@ export default {
             this.modelState = 1;
             this.dialogVisible = true;
             this.form = JSON.parse(JSON.stringify(row));
-            this.fileList = row.images.filter(obj => obj).map(item => {
+            this.fileList = row.images.filter(obj => obj).map((item,i) => {
+                console.log(item,row);
                 return {
                     url: item,
-                    name: row.news_title,
+                    name: row.file_name[i] || 'null',
                 }
             })
 

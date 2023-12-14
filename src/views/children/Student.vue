@@ -2,7 +2,7 @@
    <div id="User">
       <div class="manage">
          <!-- 校友编辑 -->
-         <el-dialog title="校友内容编辑" :visible.sync="dialogVisible" top='4vh' :close-on-click-modal="false">
+         <el-dialog title="校友内容编辑" :visible.sync="dialogVisible" top='5vh' :close-on-click-modal="false">
             <div id="Forms">
                <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="100%" size="mini"
                   :before-close="handleColse">
@@ -12,7 +12,7 @@
                   <div style="border: 1px solid #ccc;">
                      <Toolbar style="border-bottom: 1px solid #ccc" :editor="editor" :defaultConfig="toolbarConfig"
                         :mode="mode" />
-                     <Editor style="height: 600px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
+                     <Editor style="height: 400px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
                         :mode="mode" @onCreated="onCreated" @onChange="onChange" @onDestroyed="onDestroyed"
                         @onMaxLength="onMaxLength" @onFocus="onFocus" @onBlur="onBlur" @customAlert="customAlert"
                         @customPaste="customPaste" />
@@ -83,7 +83,7 @@ export default Vue.extend({
             imageList: []
          },
          rules: {
-            name: [{ required: true, message: "请输入校友标题" }],
+            title: [{ required: true, message: "请输入标题" }],
             addr: [{ required: true, message: "请输入校友内容" }],
          },
          tableData: [],

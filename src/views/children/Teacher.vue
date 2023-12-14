@@ -99,7 +99,7 @@ export default {
         gender: 0
       },
       rules: {
-        name: [{ required: true, message: "请输入校友姓名" }],
+        title: [{ required: true, message: "请输入标题" }],
         addr: [{ required: true, message: "请输入校友描述" }],
       },
       tableData: [],

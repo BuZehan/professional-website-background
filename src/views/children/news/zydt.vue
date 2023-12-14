@@ -2,17 +2,17 @@
    <div id="User">
       <div class="manage">
          <!-- 新闻编辑 -->
-         <el-dialog title="新闻编辑" :visible.sync="dialogVisible" top='2vh' :close-on-click-modal="false">
+         <el-dialog title="新闻编辑" :visible.sync="dialogVisible" top='5vh' :close-on-click-modal="false">
             <div id="Forms">
-               <el-form ref="form" :rules="rules" label-position="left" :model="form" label-width="100px" width="100%" size="mini"
-                  :before-close="handleColse">
-                  <el-form-item  prop="title" label="新闻标题：">
+               <el-form ref="form" :rules="rules" label-position="left" :model="form" label-width="100px" width="100%"
+                  size="mini" :before-close="handleColse">
+                  <el-form-item prop="title" label="新闻标题：">
                      <el-input placeholder="请输入标题" v-model="form.title"></el-input>
-                   </el-form-item>
+                  </el-form-item>
                   <div style="border: 1px solid #ccc;">
                      <Toolbar style="border-bottom: 1px solid #ccc" :editor="editor" :defaultConfig="toolbarConfig"
                         :mode="mode" />
-                     <Editor style="height: 700px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
+                     <Editor style="height: 400px; overflow-y: hidden;" v-model="html" :defaultConfig="editorConfig"
                         :mode="mode" @onCreated="onCreated" @onChange="onChange" @onDestroyed="onDestroyed"
                         @onMaxLength="onMaxLength" @onFocus="onFocus" @onBlur="onBlur" @customAlert="customAlert"
                         @customPaste="customPaste" />
@@ -83,7 +83,7 @@ export default Vue.extend({
             imageList: []
          },
          rules: {
-            name: [{ required: true, message: "请输入新闻标题" }],
+            title: [{ required: true, message: "请输入新闻标题" }],
             addr: [{ required: true, message: "请输入新闻内容" }],
          },
          tableData: [],
@@ -188,7 +188,6 @@ export default Vue.extend({
             let imageList = item.image_list ? JSON.parse(item.image_list) : [];
             // 匹配<img />标签的个数
             const imgCount = (item.content?.match(/<img\s.*?>/g) || []).length;
-
             // 匹配<img />标签的href链接
             const hrefList = item.content?.match(/<img\s.*?src="(.*?)".*?>/g)?.map(imgTag => {
                const hrefMatch = imgTag.match(/src="(.*?)"/);

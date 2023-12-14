@@ -1,17 +1,17 @@
 <template>
   <div id="User">
     <div class="manage">
-      <el-dialog title="新闻管理" :visible.sync="dialogVisible">
+      <el-dialog title="公告管理" :visible.sync="dialogVisible">
         <div id="Forms">
           <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="55%" size="mini"
             :before-close="handleColse">
-            <!-- 新闻标题 -->
-            <el-form-item style="width: 200px" prop="news_title" label="新闻标题">
-              <el-input placeholder="请输入新闻标题" v-model="form.news_title"></el-input>
+            <!-- 公告标题 -->
+            <el-form-item style="width: 200px" prop="news_title" label="公告标题">
+              <el-input placeholder="请输入公告标题" v-model="form.news_title"></el-input>
             </el-form-item>
-            <!-- 新闻内容 -->
-            <el-form-item prop="news_content" label="新闻内容" style="width: 800px !important;">
-              <el-input type="textarea" placeholder="请输入新闻内容" v-model="form.news_content"></el-input>
+            <!-- 公告内容 -->
+            <el-form-item prop="news_content" label="公告内容" style="width: 800px !important;">
+              <el-input type="textarea" placeholder="请输入公告内容" v-model="form.news_content"></el-input>
             </el-form-item>
             <el-form-item style="width: 800px !important;">
               <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="9"
@@ -46,9 +46,9 @@
       <!-- 表格数据 -->
       <div class="manger">
         <template>
-          <el-table height="606px" :data="tableData" style="width: 100%">
-            <el-table-column prop="news_title" label="新闻标题"   :show-overflow-tooltip="true"> </el-table-column>
-            <el-table-column prop="news_content" label="新闻内容" :show-overflow-tooltip="true"> </el-table-column>
+          <el-table height="400px" :data="tableData" style="width: 100%">
+            <el-table-column prop="news_title" label="公告标题"   :show-overflow-tooltip="true"> </el-table-column>
+            <el-table-column prop="news_content" label="公告内容" :show-overflow-tooltip="true"> </el-table-column>
             <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
             <el-table-column label="图片">
               <template slot-scope="scope">
@@ -90,15 +90,15 @@ export default {
         news_content: "",
       },
       rules: {
-        name: [{ required: true, message: "请输入新闻标题" }],
-        addr: [{ required: true, message: "请输入新闻内容" }],
+        news_title: [{ required: true, message: "请输入公告标题" }],
+        addr: [{ required: true, message: "请输入公告内容" }],
       },
       tableData: [],
       modelState: 0, //新增用户和编辑用户的状态控制
       total: 0,
       pageData: {
         page: 1,//当前页码
-        limit: 10//当前页码数据条数
+        limit: 6//当前页码数据条数
       },
       userForm: {
         name: ''
@@ -183,7 +183,7 @@ export default {
       });
       this.total = res.data.total || 0
     },
-    //添加新闻
+    //添加公告
     handleAdd() {
       this.fileList = []
       this.form = {
@@ -193,7 +193,7 @@ export default {
       this.modelState = 0;
       this.dialogVisible = true;
     },
-    //修改新闻信息
+    //修改公告信息
     async handleChange(row) {
       this.modelState = 1;
       this.dialogVisible = true;
