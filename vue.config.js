@@ -27,7 +27,7 @@ module.exports = defineConfig({
     proxy: {
       //配置代理服务器
       "/api": {
-        target: "http://192.168.55.232:3000/", //目标url
+        target: 'http://192.168.55.232:3000/', //目标url
         changeOrigin: true, //允许跨域
         pathRewrite: (path) => path.replace(/^\/api/, "/api/v1"), //重写路径,替换/api
       },

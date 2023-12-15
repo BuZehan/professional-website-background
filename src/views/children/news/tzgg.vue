@@ -69,7 +69,7 @@
         </template>
         <!-- 分页器 -->
         <div class="elPagination">
-          <el-pagination layout="prev, pager, next" :total='total' @current-change="changePage">
+          <el-pagination layout="prev, pager, next" :total='total' page-size="5" @current-change="changePage">
           </el-pagination>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default {
       // 向formData对象中添加要上传的文件
       this.fileData = this.fileData ? this.fileData : new FormData();
       this.fileData.append('files', res.file)
-      // console.log("files:", res);
+      console.log("files:", res);
     },
     //点击表单提交操作
     handleSubmit() {

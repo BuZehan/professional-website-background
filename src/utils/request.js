@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-    baseURL: process.env.NODE_ENV == 'development' ? '/api' : `${process.env.VUE_APP_API_URL}`,
+    baseURL: process.env.NODE_ENV == 'development' ? '/api' : `http://121.37.119.45:8800/api/v1`,
     timeout: 10000,
     // withCredentials:true 
 });

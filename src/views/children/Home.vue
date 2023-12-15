@@ -15,8 +15,8 @@ export default {
         xwdt: 0,
         tzgg: 0,
         hjzs: 0,
-        swiper: 3,
-        stuNum: 8,
+        swiper: 0,
+        stuNum: 0,
         teacherNum: 6,
       }
     };

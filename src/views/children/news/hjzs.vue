@@ -14,11 +14,18 @@
                             <el-input type="textarea" placeholder="请输入证书内容" v-model="form.news_content"></el-input>
                         </el-form-item>
                         <!-- 证书分类 -->
-                        <el-form-item label="证书分类">
+                        <!-- <el-form-item label="证书分类">
                             <el-radio-group v-model="form.type">
                                 <el-radio style="margin-top: 5px;" label="学院证书" />
                                 <el-radio style="margin-top: 5px;" label="教师证书" />
                                 <el-radio style="margin-top: 5px;" label="学生证书" />
+                            </el-radio-group>
+                        </el-form-item> -->
+                        <el-form-item label="证书分类" prop="type">
+                            <el-radio-group v-model="form.type">
+                                <el-radio label="学院证书"></el-radio>
+                                <el-radio label="教师证书"></el-radio>
+                                <el-radio label="学生证书"></el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item style="width: 800px !important;">
@@ -61,7 +68,7 @@
             <!-- 表格数据 -->
             <div class="manger">
                 <template>
-                    <el-table height="400px" :data="tableData" style="width: 100%">
+                    <el-table height="500px" :data="tableData" style="width: 100%">
                         <el-table-column prop="news_title" label="证书标题" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="news_content" label="证书内容" :show-overflow-tooltip="true"> </el-table-column>
                         <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column>
@@ -70,8 +77,8 @@
                             <template slot-scope="scope">
                                 <div style="display: flex;">
                                     <template v-for="(item, index) in scope.row.images">
-                                        <a style="text-decoration: none;color: #333; display:flex;" :href="scope.row.images[0]"
-                                            target="_blank"
+                                        <a style="text-decoration: none;color: #333; display:flex;"
+                                            :href="scope.row.images[0]" target="_blank"
                                             v-if="fileType.includes(scope.row.images[0].match(/\.([^.]+)$/)[1])">
                                             <!-- {{ scope.row.images[0].match(/\.([^.]+)$/)[1] }} -->
                                             附件
@@ -93,7 +100,7 @@
                 </template>
                 <!-- 分页器 -->
                 <div class="elPagination">
-                    <el-pagination layout="prev, pager, next" :total='total' @current-change="changePage">
+                    <el-pagination layout="prev, pager, next" page-size="5" :total='total'  @current-change="changePage">
                     </el-pagination>
                 </div>
             </div>
@@ -108,25 +115,28 @@ export default {
     name: "hjzs",
     data() {
         return {
-            linkIcon:require('@/assets/link.png'),
+            linkIcon: require('@/assets/link.png'),
             fileType: ['pdf', 'doc', 'docx'],
             dialogVisible: false,
             form: {
                 news_title: "",
                 news_content: "",
-                file_name:'',
+                file_name: '',
                 type: ""
             },
             rules: {
                 news_title: [{ required: true, message: "请输入标题" }],
-                addr: [{ required: true, message: "请输入新闻内容" }],
+                news_content: [{ required: true, message: "请输入新闻内容" }],
+                type: [
+                    { required: true, message: '选择证书类型', trigger: 'change' }
+                ],
             },
             tableData: [],
             modelState: 0, //新增用户和编辑用户的状态控制
             total: 0,
             pageData: {
                 page: 1,//当前页码
-                limit: 6//当前页码数据条数
+                limit: 5//当前页码数据条数
             },
             filterDataForm: {
                 type: ["学生证书", "教师证书", "学院证书"]
@@ -138,11 +148,11 @@ export default {
     methods: {
         uploadFiles(res) {
             // 向formData对象中添加要上传的文件
-            console.log(res);
+            console.log(res.file);
             this.fileData = this.fileData ? this.fileData : new FormData();
             this.fileData.append('files', res.file)
             this.form.file_name = res.file.name
-            // console.log("files:", res);
+            console.log("files:", res);
         },
         //点击表单提交操作
         handleSubmit() {
@@ -152,6 +162,12 @@ export default {
                     if (this.modelState == 0) {
                         //modelState 为0 添加用户
                         this.$refs.upload.submit();
+                    console.log(this.form.file_name);
+
+                        if(!this.form.file_name) {
+                            this.$message.error("请上传文件")
+                            return
+                        }
                         this.fileData = this.fileData ? this.fileData : new FormData();
                         this.fileData.append("formData", JSON.stringify(this.form))
                         this.form = {
@@ -213,8 +229,8 @@ export default {
                     type: item.type,
                 };
             });
-            // console.log(res);
-            this.total = res.data.total || 0
+            console.log(res);
+            this.total = res.data.total
         },
         //添加新闻
         handleAdd() {
@@ -222,7 +238,10 @@ export default {
             this.form = {
                 news_title: "",
                 news_content: "",
+                type: '',
+                file_name: "",
             }
+            this.fileData = null;
             this.modelState = 0;
             this.dialogVisible = true;
         },
@@ -231,8 +250,8 @@ export default {
             this.modelState = 1;
             this.dialogVisible = true;
             this.form = JSON.parse(JSON.stringify(row));
-            this.fileList = row.images.filter(obj => obj).map((item,i) => {
-                console.log(item,row);
+            this.fileList = row.images.filter(obj => obj).map((item, i) => {
+                console.log(item, row);
                 return {
                     url: item,
                     name: row.file_name[i] || 'null',
