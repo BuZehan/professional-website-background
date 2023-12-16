@@ -9,6 +9,10 @@
                   <el-form-item prop="title" label="新闻标题：">
                      <el-input placeholder="请输入标题" v-model="form.title"></el-input>
                   </el-form-item>
+                  <!-- 副标题 -->
+                  <!-- <el-form-item prop="news_content" label="副标题" width="100%">
+                     <el-input placeholder="请输入副标题" v-model="form.news_content"></el-input>
+                  </el-form-item> -->
                   <div style="border: 1px solid #ccc;">
                      <Toolbar style="border-bottom: 1px solid #ccc" :editor="editor" :defaultConfig="toolbarConfig"
                         :mode="mode" />
@@ -57,7 +61,7 @@
             </template>
             <!-- 分页器 -->
             <div class="elPagination">
-               <el-pagination layout="prev, pager, next" :total='total'  page-size="5" @current-change="changePage">
+               <el-pagination layout="prev, pager, next" :total='total' :page-size="5" @current-change="changePage">
                </el-pagination>
             </div>
          </div>
@@ -79,12 +83,14 @@ export default Vue.extend({
          dialogVisible: false,
          form: {
             title: "",
+            news_content:'',
             editorData: "",
             imageList: []
          },
          rules: {
             title: [{ required: true, message: "请输入新闻标题" }],
-            addr: [{ required: true, message: "请输入新闻内容" }],
+            news_content: [{ required: true, message: "请输入新闻内容" }],
+            
          },
          tableData: [],
          modelState: 0, //新增用户和编辑用户的状态控制

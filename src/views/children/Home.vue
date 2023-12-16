@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getShowDataForAlumni ,getShowDataForBanner,getShowDataForTeacher} from "@/api";
+import { getShowData, getShowDataForTzgg, getShowDataForHjzs, getShowDataForAlumni, getShowDataForBanner, getShowDataForTeacher } from "@/api";
 
 export default {
   name: "Home",
@@ -17,7 +17,7 @@ export default {
         hjzs: 0,
         swiper: 0,
         stuNum: 0,
-        teacherNum: 6,
+        teacherNum: 0,
       }
     };
   },
@@ -69,13 +69,18 @@ export default {
     // 获取数据
     async getShowDatas() {
       try {
-        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs(),getShowDataForBanner(),getShowDataForAlumni(),getShowDataForTeacher()])
+        let res = await Promise.all([getShowData(), getShowDataForTzgg(), getShowDataForHjzs(), getShowDataForAlumni(), getShowDataForTeacher()])
         res.forEach(item => {
           let data = item.data.data;
           Object.entries(data).forEach(([key, value]) => {
+            if (key === 'xwdt') {
+              this.newsData['xwdt'] = 10
+            }
+            console.log(key, value);
             this.newsData[key] = value
           })
         })
+
         this.drawLine()
 
       } catch (error) {

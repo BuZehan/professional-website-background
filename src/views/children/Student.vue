@@ -57,7 +57,7 @@
             </template>
             <!-- 分页器 -->
             <div class="elPagination">
-               <el-pagination layout="prev, pager, next" page-size="5" :total='total' @current-change="changePage">
+               <el-pagination layout="prev, pager, next" :page-size="5" :total='total' @current-change="changePage">
                </el-pagination>
             </div>
          </div>
