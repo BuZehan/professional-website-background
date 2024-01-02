@@ -6,8 +6,8 @@
           <el-form ref="form" :rules="rules" :model="form" label-width="100px" width="55%" size="mini"
             :before-close="handleColse">
             <!-- 教师表单标题 -->
-            <el-form-item style="width: 200px" prop="news_title" label="教师姓名">
-              <el-input placeholder="请输入教师标题" v-model="form.teacher_name"></el-input>
+            <el-form-item style="width: 200px" prop="teacher_name" label="教师姓名">
+              <el-input placeholder="请输入教师姓名" v-model="form.teacher_name"></el-input>
             </el-form-item>
             <el-form-item prop="gender" label="教师性别" style="width: 800px !important;">
               <el-radio-group v-model="form.gender">
@@ -15,10 +15,19 @@
                 <el-radio :label="1">男</el-radio>
               </el-radio-group>
             </el-form-item>
-           
+            <!-- 副标题 -->
+            <el-form-item style="width: 200px" prop="teacher_position" label="教师职位">
+              <el-input placeholder="如：某某专业负责人" v-model="form.teacher_position"></el-input>
+            </el-form-item>
             <!-- 教师表单内容 -->
-            <el-form-item prop="news_content" label="教师内容" style="width: 800px !important;">
-              <el-input type="textarea" placeholder="请输入教师内容" v-model="form.teacher_desc"></el-input>
+            <el-form-item prop="teacher_edu_exp" label="教育经历" style="width: 800px !important;">
+              <el-input type="textarea" placeholder="请输入教育经历" v-model="form.teacher_edu_exp"></el-input>
+            </el-form-item>
+            <el-form-item prop="teacher_study_exp" label="研究领域" style="width: 800px !important;">
+              <el-input type="textarea" placeholder="请输入研究领域" v-model="form.teacher_study_exp"></el-input>
+            </el-form-item>
+            <el-form-item prop="teacher_work_exp" label="工作经历" style="width: 800px !important;">
+              <el-input type="textarea" placeholder="请输入工作经历" v-model="form.teacher_work_exp"></el-input>
             </el-form-item>
             <el-form-item style="width: 800px !important;">
               <el-upload class="upload-demo" ref="upload" :action="''" :multiple="true" :limit="9"
@@ -56,7 +65,10 @@
           <el-table height="500px" :data="tableData" style="width: 100%">
             <el-table-column prop="teacher_name" label="姓名" :show-overflow-tooltip="true"> </el-table-column>
             <el-table-column prop="gender" label="性别" :show-overflow-tooltip="true"> </el-table-column>
-            <el-table-column prop="teacher_desc" label="描述" :show-overflow-tooltip="true"> </el-table-column>
+            <el-table-column prop="teacher_position" label="教师职位" :show-overflow-tooltip="true"> </el-table-column>
+            <el-table-column prop="teacher_edu_exp" label="教育经历" :show-overflow-tooltip="true"> </el-table-column>
+            <el-table-column prop="teacher_study_exp" label="研究领域" :show-overflow-tooltip="true"> </el-table-column>
+            <el-table-column prop="teacher_work_exp" label="工作经历" :show-overflow-tooltip="true"> </el-table-column>
             <!-- <el-table-column prop="release_time" label="发布时间" :show-overflow-tooltip="true"> </el-table-column> -->
             <el-table-column label="图片">
               <template slot-scope="scope">
@@ -95,12 +107,15 @@ export default {
       dialogVisible: false,
       form: {
         teacher_name: "",
-        teacher_desc: "",
-        gender: 0
+        teacher_edu_exp: "",
+        teacher_study_exp: "",
+        teacher_work_exp: "",
+        gender: 0,
+        teacher_position:""
       },
       rules: {
-        title: [{ required: true, message: "请输入标题" }],
-        addr: [{ required: true, message: "请输入校友描述" }],
+        teacher_name: [{ required: true, message: "请输入教师姓名" }],
+        gender: [{ required: true, message: "请输入性别" }],
       },
       tableData: [],
       modelState: 0, //新增用户和编辑用户的状态控制
@@ -134,8 +149,12 @@ export default {
             this.fileData = this.fileData ? this.fileData : new FormData();
             this.fileData.append("formData", JSON.stringify(this.form))
             this.form = {
-              news_title: "",
-              news_content: "",
+              teacher_name: "",
+              teacher_edu_exp: "",
+              teacher_study_exp: "",
+              teacher_work_exp: "",
+              teacher_position:'',
+              gender: 0
             }
             addTeacher(this.fileData).then((res) => {
               //成功添加 再次获取列表数据
@@ -186,9 +205,12 @@ export default {
           id: item.id,
           images: item.teacherImage.map(img => img.image_path),
           teacher_name: item.teacher_name,
-          teacher_desc: item.teacher_desc,
+          teacher_edu_exp: item.teacher_edu_exp,
+          teacher_study_exp: item.teacher_study_exp,
+          teacher_work_exp: item.teacher_work_exp,
           release_time: item.release_time,
-          gender: item.gender == 0 ? '女':'男'
+          teacher_position:item.teacher_position,
+          gender: item.gender == 0 ? '女' : '男'
         };
       });
       this.total = res.data.total || 0
@@ -198,8 +220,11 @@ export default {
       this.fileList = []
       this.form = {
         teacher_name: "",
-        teacher_desc: "",
-        gender:''
+        teacher_edu_exp: '',
+        teacher_study_exp: '',
+        teacher_work_exp: '',
+        gender: '',
+        teacher_position:''
       }
       this.modelState = 0;
       this.dialogVisible = true;
@@ -209,6 +234,7 @@ export default {
       this.modelState = 1;
       this.dialogVisible = true;
       this.form = JSON.parse(JSON.stringify(row));
+      this.form.gender = row.gender === '男' ? 1 : 0;
       this.fileList = row.images.filter(obj => obj).map(item => {
         return {
           url: item,

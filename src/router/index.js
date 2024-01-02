@@ -17,7 +17,9 @@ const routes = [{
     name: "login",
     component: () =>
         import ("@/views/login.vue")
-}]
+}
+
+]
 
 const router = new VueRouter({
         routes,
